@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Camera, RefreshCw, Leaf, Moon, Sun } from 'lucide-react';
+import { Camera, RefreshCw, Leaf, Moon, Sun, Download } from 'lucide-react';
 import { UserProfileCard } from './components/UserProfileCard';
 import { WeightChart } from './components/WeightChart';
 import { AnalysisResult } from './components/AnalysisResult';
@@ -40,6 +40,8 @@ const App: React.FC = () => {
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isLateNight, setIsLateNight] = useState(false);
+  const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
+  const [showInstallBtn, setShowInstallBtn] = useState(false);
 
   // --- Effects ---
   
@@ -61,7 +63,28 @@ const App: React.FC = () => {
       setIsLateNight(hour >= 20 || hour < 5); // Late night is after 8 PM or before 5 AM
   }, []);
 
+  // PWA Install Prompt Listener
+  useEffect(() => {
+    const handler = (e: any) => {
+      e.preventDefault();
+      setDeferredPrompt(e);
+      setShowInstallBtn(true);
+    };
+    window.addEventListener('beforeinstallprompt', handler);
+    return () => window.removeEventListener('beforeinstallprompt', handler);
+  }, []);
+
   // --- Handlers ---
+
+  const handleInstallClick = async () => {
+    if (!deferredPrompt) return;
+    deferredPrompt.prompt();
+    const { outcome } = await deferredPrompt.userChoice;
+    if (outcome === 'accepted') {
+      setShowInstallBtn(false);
+    }
+    setDeferredPrompt(null);
+  };
 
   const handleLogMeal = (carbs: number) => {
     setDailyCarbs(prev => prev + carbs);
@@ -101,6 +124,16 @@ const App: React.FC = () => {
               <p className="text-xs text-emerald-600 font-medium">IA Diet Coach</p>
             </div>
           </div>
+          
+          {showInstallBtn && (
+            <button 
+              onClick={handleInstallClick}
+              className="flex items-center gap-1 bg-emerald-100 text-emerald-700 px-3 py-1.5 rounded-full text-xs font-bold hover:bg-emerald-200 transition-colors"
+            >
+              <Download size={14} />
+              Instalar App
+            </button>
+          )}
         </div>
       </header>
 

@@ -1,0 +1,7 @@
+{
+  "name": "Espírito da Terra AI",
+  "description": "Seu assistente nutricional e personal trainer de bolso especializado na Dieta South Beach.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}

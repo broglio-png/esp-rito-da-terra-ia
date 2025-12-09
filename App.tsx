@@ -66,11 +66,22 @@ const App: React.FC = () => {
   // PWA Install Prompt Listener
   useEffect(() => {
     const handler = (e: any) => {
+      // Prevent the mini-infobar from appearing on mobile
       e.preventDefault();
+      // Stash the event so it can be triggered later.
       setDeferredPrompt(e);
+      // Update UI notify the user they can install the PWA
       setShowInstallBtn(true);
+      console.log("Install prompt captured");
     };
+    
     window.addEventListener('beforeinstallprompt', handler);
+    
+    // Check if already installed
+    if (window.matchMedia('(display-mode: standalone)').matches) {
+        setShowInstallBtn(false);
+    }
+
     return () => window.removeEventListener('beforeinstallprompt', handler);
   }, []);
 
@@ -78,8 +89,11 @@ const App: React.FC = () => {
 
   const handleInstallClick = async () => {
     if (!deferredPrompt) return;
+    // Show the install prompt
     deferredPrompt.prompt();
+    // Wait for the user to respond to the prompt
     const { outcome } = await deferredPrompt.userChoice;
+    console.log(`User response to the install prompt: ${outcome}`);
     if (outcome === 'accepted') {
       setShowInstallBtn(false);
     }
@@ -131,7 +145,7 @@ const App: React.FC = () => {
               className="flex items-center gap-1 bg-emerald-100 text-emerald-700 px-3 py-1.5 rounded-full text-xs font-bold hover:bg-emerald-200 transition-colors"
             >
               <Download size={14} />
-              Instalar App
+              Instalar
             </button>
           )}
         </div>

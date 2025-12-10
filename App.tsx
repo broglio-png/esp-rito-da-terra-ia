@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Camera, RefreshCw, Leaf, Moon, Sun, Download } from 'lucide-react';
+import { Camera, RefreshCw, Leaf, Moon, Sun, Download, AlertCircle } from 'lucide-react';
 import { UserProfileCard } from './components/UserProfileCard';
 import { WeightChart } from './components/WeightChart';
 import { AnalysisResult } from './components/AnalysisResult';
@@ -115,8 +115,8 @@ const App: React.FC = () => {
       try {
         const result = await analyzeMeal(file, profile);
         setAnalysis(result);
-      } catch (err) {
-        setError("Não foi possível analisar a imagem. Tente novamente.");
+      } catch (err: any) {
+        setError(err.message || "Não foi possível analisar a imagem. Tente novamente.");
         console.error(err);
       } finally {
         setIsLoading(false);
@@ -214,9 +214,12 @@ const App: React.FC = () => {
 
         {/* Error State */}
         {error && (
-          <div className="bg-red-50 text-red-700 p-4 rounded-xl border border-red-200 mb-6 flex items-center gap-3">
-             <div className="bg-red-100 p-2 rounded-full"><RefreshCw size={16} /></div>
-             <p className="text-sm font-medium">{error}</p>
+          <div className="bg-red-50 text-red-700 p-4 rounded-xl border border-red-200 mb-6 flex items-start gap-3">
+             <div className="bg-red-100 p-2 rounded-full shrink-0"><AlertCircle size={20} /></div>
+             <div>
+                <p className="font-bold text-sm">Erro ao processar:</p>
+                <p className="text-sm">{error}</p>
+             </div>
           </div>
         )}
 
